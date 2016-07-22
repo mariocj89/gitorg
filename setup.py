@@ -13,6 +13,5 @@ setup(
     scripts=['bin/gitorg'],
     test_suite='nose.collector',
     use_2to3=True,
-    install_requires=['six', 'PyGithub'],
-    tests_require=['mock', 'nose']
+    install_requires=['six', 'PyGithub', 'GitPython'],
 )
