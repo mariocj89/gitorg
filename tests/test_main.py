@@ -20,7 +20,18 @@ def test_gitorg_without_auth():
 def test_gitorg_with_token_as_argument(gh):
     runner = CliRunner()
     runner.invoke(main.gitorg, ['--token=1234', 'clone'], obj={})
-    gh.assert_called_with('1234')
+    args, kwargs = gh.call_args
+    assert '1234' == args[0]
+
+
+@mock.patch("gitorg.main.github.Github")
+def test_gitorg_with_custom_base_url(gh):
+    runner = CliRunner()
+    runner.invoke(main.gitorg, ['--github_base_url=url', '--token=1234',
+                                'clone'], obj={})
+    args, kwargs = gh.call_args
+    assert '1234' == args[0]
+    assert kwargs['base_url'] == 'url'
 
 
 @mock.patch("gitorg.main.github.Github")
@@ -28,7 +39,8 @@ def test_gitorg_with_token_as_env_variable(gh):
     runner = CliRunner()
     runner.invoke(main.gitorg, ['clone'], obj={},
                   env={'GITHUB_TOKEN': '1234'})
-    gh.assert_called_with('1234')
+    args, kwargs = gh.call_args
+    assert '1234' == args[0]
 
 
 @mock.patch("click.prompt")
@@ -38,7 +50,9 @@ def test_gitorg_with_username(gh, prompt):
     prompt.return_value = 'this_is_real_password'
     runner.invoke(main.gitorg, ['clone'], obj={},
                   env={'GITHUB_USER': 'mariocj89'})
-    gh.assert_called_with('mariocj89', 'this_is_real_password')
+    args, kwargs = gh.call_args
+    assert 'mariocj89' == args[0]
+    assert 'this_is_real_password' == args[1]
 
 
 def test_clone_requires_org():

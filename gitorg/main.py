@@ -5,19 +5,24 @@ import git
 import os
 
 
+DEFAULT_GITHUB_BASE_URL = "https://api.github.com"
+
+
 @click.group()
 @click.option("--token", help="GitHub API token to use", envvar="GITHUB_TOKEN")
 @click.option("--user", help="GitHub user to use", envvar="GITHUB_USER")
+@click.option("--github_base_url", help="GitHub base api url",
+              envvar="GITHUB_API_URL", default=DEFAULT_GITHUB_BASE_URL)
 @click.pass_context
-def gitorg(ctx, token, user):
+def gitorg(ctx, token, user, github_base_url):
     """Utility to work in a "git fashion" with github organizations.
     Allows to clone and keep in sync a local folder with a github organization
     or user"""
     if token:
-        gh = github.Github(token)
+        gh = github.Github(token, base_url=github_base_url)
     elif user:
         password = click.prompt("GitHub password: ", hide_input=True)
-        gh = github.Github(user, password)
+        gh = github.Github(user, password, base_url=github_base_url)
     else:
         raise click.UsageError("Provide either user or token")
     ctx.obj['github'] = gh
