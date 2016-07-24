@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 from setuptools import setup
+import pypandoc
 
 setup(
     name='gitorg',
     packages=['gitorg'],
     version='0.0.1',
     description='Use git for organizations!',
+    long_description=pypandoc.convert('README.md', 'rst')
     author='Mario Corchero',
     author_email='mariocj89@gmail.com',
     url='https://github.com/Mariocj89/gitorg',
