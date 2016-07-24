@@ -10,8 +10,12 @@ setup(
     author_email='mariocj89@gmail.com',
     url='https://github.com/Mariocj89/gitorg',
     keywords=['github', 'sync', 'workspace'],
-    scripts=['bin/gitorg'],
     test_suite='nose.collector',
     use_2to3=True,
     install_requires=['six', 'PyGithub', 'GitPython'],
+    entry_points={
+        'console_scripts': [
+            'gitorg=gitorg.__main__:main'
+        ]
+    }
 )
