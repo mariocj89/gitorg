@@ -3,5 +3,25 @@
 [![Requirements Status](https://requires.io/github/Mariocj89/gitorg/requirements.svg?branch=master)](https://requires.io/github/Mariocj89/gitorg/requirements/?branch=master)
 [![Code Health](https://landscape.io/github/Mariocj89/gitorg/master/landscape.svg?style=flat)](https://landscape.io/github/Mariocj89/gitorg/master)
 
-# gitorg
+# GitOrg
 Tool to organise and synchronise your organisations locally with github
+
+# Install
+```pip install gitorg```
+
+# Usage
+`gitorg` aims to be as similar as possible to your experience with `git`.
+
+Note you need to provide an user or a token to use gitorg
+
+Examples:
+- Clonning an organization ```gitorg --user=<my_user> clone <org_or_user_to_clone>```
+
+# Common parameteres
+The following are parameters that are used by all commands, you can pass them as explained in the help or set a environment variable.
+
+|option|env var|description|
+|------|-------|-----------|
+|token|GITHUB_TOKEN|Github api token, [click here](https://help.github.com/articles/creating-an-access-token-for-command-line-use/) to generate one
+|user|GITHUB_USER|The user to login into github|
+|github_base_url|GITHUB_API_URL|Base url of your github instance (set it only for enterprise github)|
