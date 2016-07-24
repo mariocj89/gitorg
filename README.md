@@ -15,6 +15,7 @@ Tool to organise and synchronise your organisations locally with github
 Note you need to provide an user or a token to use gitorg
 
 Examples:
+
 - Clonning an organization ```gitorg --user=<my_user> clone <org_or_user_to_clone>```
 
 # Common parameteres
