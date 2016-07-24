@@ -5,9 +5,9 @@ import pypandoc
 setup(
     name='gitorg',
     packages=['gitorg'],
-    version='0.0.1',
+    version='0.1.0',
     description='Use git for organizations!',
-    long_description=pypandoc.convert('README.md', 'rst')
+    long_description=pypandoc.convert('README.md', 'rst'),
     author='Mario Corchero',
     author_email='mariocj89@gmail.com',
     url='https://github.com/Mariocj89/gitorg',
