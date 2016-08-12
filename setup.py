@@ -1,13 +1,22 @@
 #!/usr/bin/env python
 from setuptools import setup
-import pypandoc
+LONG_DESCRIPTION="Git helper to handle organizations"
+
+try:
+    # attempt to build a long description from README.md
+    # run sudo apt-get install pandoc and pip install pypandoc first
+    import pypandoc
+    LONG_DESCRIPTION=pypandoc.convert('README.md', 'rst')
+except (ImportError, RuntimeError, OSError):
+    pass
+
 
 setup(
     name='gitorg',
     packages=['gitorg'],
-    version='0.1.0',
+    version='0.1.1',
     description='Use git for organizations!',
-    long_description=pypandoc.convert('README.md', 'rst'),
+    long_description=LONG_DESCRIPTION,
     author='Mario Corchero',
     author_email='mariocj89@gmail.com',
     url='https://github.com/Mariocj89/gitorg',
