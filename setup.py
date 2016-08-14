@@ -14,7 +14,7 @@ except (ImportError, RuntimeError, OSError):
 setup(
     name='gitorg',
     packages=['gitorg'],
-    version='0.1.1',
+    version='0.2.0',
     description='Use git for organizations!',
     long_description=LONG_DESCRIPTION,
     author='Mario Corchero',
