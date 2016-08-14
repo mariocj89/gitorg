@@ -21,6 +21,7 @@ setup(
     author_email='mariocj89@gmail.com',
     url='https://github.com/Mariocj89/gitorg',
     keywords=['github', 'sync', 'workspace'],
+    license='BSD',
     test_suite='nose.collector',
     use_2to3=True,
     install_requires=['six', 'PyGithub', 'GitPython'],
@@ -28,5 +29,19 @@ setup(
         'console_scripts': [
             'gitorg=gitorg.__main__:main'
         ]
-    }
+    },
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Topic :: Software Development :: Version Control',
+    ],
 )
