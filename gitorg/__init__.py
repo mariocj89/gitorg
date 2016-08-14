@@ -33,7 +33,7 @@ def gitorg(ctx, token, user, github_base_url):
 @click.argument("target", required=False)
 @click.option("--use_ssh/--use_http", is_flag=True, envvar="GITORG_USE_SSH",
               help="Protocol to use to clone")
-@click.option("--clone_forks", is_flag=True, envvar="GITORG_CLONE_FORKS",
+@click.option("--clone_forks", is_flag=True, envvar="GITORG_FORKS",
               help="Clone forks as well")
 @click.pass_context
 def clone(ctx, organization, target, use_ssh, clone_forks):
@@ -65,3 +65,45 @@ def clone(ctx, organization, target, use_ssh, clone_forks):
             else:
                 url = repo.ssh_url if use_ssh else repo.git_url
                 git.Repo.clone_from(url, os.path.join(target, repo.name))
+
+
+@gitorg.command()
+@click.argument("organization", required=False)
+@click.option("--forks", is_flag=True, envvar="GITORG_FORKS",
+              help="Look for forks as well")
+@click.pass_context
+def status(ctx, organization, forks):
+    """Checks if the current folder is in sync with a github org/user
+
+    By default, the name of the org to compare to is the same as the folder name
+
+    Looks for:
+     - Repos in github not cloned locally
+     - Repos locally but not in github
+    """
+    gh = ctx.obj['github']
+
+    working_dir = os.getcwd()
+    organization = organization or os.path.basename(working_dir)
+
+    try:
+        org = gh.get_organization(organization)
+    except github.GithubException:
+        try:
+            org = gh.get_user(organization)
+        except github.GithubException:
+            raise click.UsageError("{} does not exist in github"
+                                   .format(organization))
+    local_repos = {name for name in os.listdir(working_dir) if os.path.isdir(name)}
+    gh_repos = {repo.name for repo in org.get_repos() if not repo.fork or forks}
+
+    missing_gh = [repo for repo in local_repos if repo not in gh_repos]
+    missing_local = [repo for repo in gh_repos if repo not in local_repos]
+
+    for repo in sorted(missing_gh + missing_local):
+        if repo in missing_gh:
+            click.echo("? {}".format(repo))
+        elif repo in missing_local:
+            click.echo("D {}".format(repo))
+
+
