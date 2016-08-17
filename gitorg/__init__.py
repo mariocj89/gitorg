@@ -1,12 +1,49 @@
 """Entry point for the application"""
+import time
 import click
 import github
 import git
 import os
 
+from gitorg import config
 
 DEFAULT_GITHUB_BASE_URL = "https://api.github.com"
-CONFIG_FILE = os.path.join(click.get_app_dir("gitorg"), 'config.json')
+APP_DIR = click.get_app_dir("gitorg")
+CONFIG_FILE = os.path.join(APP_DIR, 'config.json')
+
+
+def load_config():
+    """Returns a config object loaded from disk or an empty dict"""
+    try:
+        conf = config.Config.load(CONFIG_FILE)
+    except IOError:
+        conf = config.Config()
+        conf["metadata"] = dict(config_time=time.time())
+        if not os.path.isdir(APP_DIR):
+            os.mkdir(APP_DIR)
+        conf.save(CONFIG_FILE)
+        initial_config()
+    return conf
+
+
+def initial_config():
+    """Asks the user for the general configuration for the app"""
+    conf = load_config()
+    use_token = click.prompt("Do you know how to get your github api token? ",
+                             type=bool, default=True)
+    if use_token:
+        token = click.prompt("Insert a valid github user token: ")
+        conf["token"] = token
+    else:
+        user = click.prompt("What is your github user? ")
+        conf["user"] = user
+
+    github_url = click.prompt("What is your github instance API url? ",
+                              default=DEFAULT_GITHUB_BASE_URL)
+    conf["github_base_url"] = github_url
+
+    conf.save(CONFIG_FILE)
+    click.echo("Config saved in: '{}'".format(CONFIG_FILE))
 
 
 @click.group()
@@ -27,6 +64,12 @@ def gitorg(ctx, token, user, github_base_url):
     else:
         raise click.UsageError("Provide either user or token")
     ctx.obj['github'] = gh
+
+
+@gitorg.command()
+def configure():
+    """Runs the main configuration arguments for the tool"""
+    initial_config()
 
 
 @gitorg.command()

@@ -38,7 +38,10 @@ class Config(defaultdict):
         # Makes each section to default to the global
         self["global"] = config_dict.pop("global", {})
         for section, conf in config_dict.items():
-            self[section] = BackedUpDict(self._get_global_option, **conf)
+            if isinstance(conf, dict):
+                self[section] = BackedUpDict(self._get_global_option, **conf)
+            else:
+                self[section] = conf
 
     def _get_global_option(self, option_name):
         """Gets the option from the global section"""
@@ -59,5 +62,5 @@ class Config(defaultdict):
 
         If the file does not exist, an exception is thrown
         """
-        with open(config_file) as fp:
+        with open(config_file, "w") as fp:
             json.dump(self, fp)

@@ -1,7 +1,9 @@
-from gitorg import gitorg
+from gitorg import gitorg, load_config, initial_config
+
 
 def main():
-    gitorg(obj={})
+    conf = load_config()
+    gitorg(obj={}, default_map=conf)
 
 if __name__ == '__main__':  # pragma: no cover
     exit(main())
