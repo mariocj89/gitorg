@@ -6,6 +6,7 @@ import os
 
 
 DEFAULT_GITHUB_BASE_URL = "https://api.github.com"
+CONFIG_FILE = os.path.join(click.get_app_dir("gitorg"), 'config.json')
 
 
 @click.group()
