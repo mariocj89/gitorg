@@ -17,7 +17,8 @@ Note you need to provide an user or a token to use gitorg
 
 Examples:
 
-- Clonning an organization ```gitorg --user=<my_user> clone <org_or_user_to_clone>```
+- Clonning an organization ```gitorg clone <org_or_user_to_clone>```
+- Checking for new repos ```gitorg status```
 
 # Common parameteres
 The following are parameters that are used by all commands, you can pass them as explained in the help or set a environment variable.
@@ -27,3 +28,5 @@ The following are parameters that are used by all commands, you can pass them as
 |token|GITHUB_TOKEN|Github api token, [click here](https://help.github.com/articles/creating-an-access-token-for-command-line-use/) to generate one
 |user|GITHUB_USER|The user to login into github|
 |github_base_url|GITHUB_API_URL|Base url of your github instance (set it only for enterprise github)|
+
+Those parameters will be asked the first time you run `gitorg` if you want the setup wizart to prompt for the config parameters again, run `gitorg configure`
