@@ -170,6 +170,7 @@ def test_clone_org_with_two_repos(gh, _, isdir_mock, clone_mock):
     clone_mock.assert_any_call('repo_url', "my_user/gitorg")
     clone_mock.assert_any_call('repo_url2', "my_user/hubsync")
 
+
 @mock.patch('gitorg.click.echo')
 @mock.patch('gitorg.os.listdir')
 @mock.patch('gitorg.os.path.isdir')
@@ -184,8 +185,8 @@ def test_status_on_sync_org(gh, wd_mock, _, listdir_mock, echo_mock):
     get_repos_mock = gh.return_value.get_organization.return_value.get_repos
     get_repos_mock.return_value = [repo1, repo2]
 
-    wd_mock.return_value="orgname"
-    listdir_mock.return_value=["gitorg", "hubsync"]
+    wd_mock.return_value = "orgname"
+    listdir_mock.return_value = ["gitorg", "hubsync"]
 
     result = runner.invoke(gitorg.gitorg, ['status'],
                            obj={}, env={'GITHUB_TOKEN': '1234'})
@@ -193,6 +194,7 @@ def test_status_on_sync_org(gh, wd_mock, _, listdir_mock, echo_mock):
     gh.return_value.get_organization.assert_called_with("orgname")
     assert result.exit_code == 0
     assert not echo_mock.called
+
 
 @mock.patch('gitorg.click.echo')
 @mock.patch('gitorg.os.listdir')
@@ -208,8 +210,8 @@ def test_status_added_folder(gh, wd_mock, _, listdir_mock, echo_mock):
     get_repos_mock = gh.return_value.get_organization.return_value.get_repos
     get_repos_mock.return_value = [repo1, repo2]
 
-    wd_mock.return_value="orgname"
-    listdir_mock.return_value=["gitorg", "hubsync", "newrepo"]
+    wd_mock.return_value = "orgname"
+    listdir_mock.return_value = ["gitorg", "hubsync", "newrepo"]
 
     result = runner.invoke(gitorg.gitorg, ['status'],
                            obj={}, env={'GITHUB_TOKEN': '1234'})
@@ -217,6 +219,7 @@ def test_status_added_folder(gh, wd_mock, _, listdir_mock, echo_mock):
     gh.return_value.get_organization.assert_called_with("orgname")
     assert result.exit_code == 0
     echo_mock.assert_called_with("? newrepo")
+
 
 @mock.patch('gitorg.click.echo')
 @mock.patch('gitorg.os.listdir')
@@ -232,8 +235,8 @@ def test_status_missing_repo(gh, wd_mock, _, listdir_mock, echo_mock):
     get_repos_mock = gh.return_value.get_organization.return_value.get_repos
     get_repos_mock.return_value = [repo1, repo2]
 
-    wd_mock.return_value="orgname"
-    listdir_mock.return_value=["gitorg"]
+    wd_mock.return_value = "orgname"
+    listdir_mock.return_value = ["gitorg"]
 
     result = runner.invoke(gitorg.gitorg, ['status'],
                            obj={}, env={'GITHUB_TOKEN': '1234'})
@@ -241,3 +244,62 @@ def test_status_missing_repo(gh, wd_mock, _, listdir_mock, echo_mock):
     gh.return_value.get_organization.assert_called_with("orgname")
     assert result.exit_code == 0
     echo_mock.assert_called_with("D hubsync")
+
+
+@mock.patch('gitorg.click.echo')
+@mock.patch('gitorg.os.listdir')
+@mock.patch('gitorg.os.path.isdir')
+@mock.patch('gitorg.os.getcwd')
+@mock.patch("gitorg.github.Github")
+def test_status_of_a_user(gh, wd_mock, _, listdir_mock, echo_mock):
+    runner = CliRunner()
+    gh.return_value.get_organization.return_value.get_repos.return_value = []
+    wd_mock.return_value = "orgname"
+    listdir_mock.return_value = []
+
+    gh.return_value.get_organization.side_effect = github.GithubException(1, 1)
+    result = runner.invoke(gitorg.gitorg, ['status'],
+                           obj={}, env={'GITHUB_TOKEN': '1234'})
+
+    gh.return_value.get_user.assert_called_with("orgname")
+    assert result.exit_code == 0
+    assert not echo_mock.called
+
+
+@mock.patch('gitorg.click.echo')
+@mock.patch('gitorg.os.listdir')
+@mock.patch('gitorg.os.path.isdir')
+@mock.patch('gitorg.os.getcwd')
+@mock.patch("gitorg.github.Github")
+def test_status_of_invalid_org(gh, wd_mock, _, listdir_mock, echo_mock):
+    runner = CliRunner()
+    gh.return_value.get_organization.return_value.get_repos.return_value = []
+    wd_mock.return_value = "orgname"
+    listdir_mock.return_value = []
+
+    gh.return_value.get_organization.side_effect = github.GithubException(1, 1)
+    gh.return_value.get_user.side_effect = github.GithubException(1, 1)
+    result = runner.invoke(gitorg.gitorg, ['status'],
+                           obj={}, env={'GITHUB_TOKEN': '1234'})
+
+    assert result.exit_code == 2
+
+
+@mock.patch('gitorg.click.echo')
+@mock.patch("gitorg.click.prompt")
+@mock.patch("gitorg.config.Config")
+def test_configure_doesnt_throw(_, _2, _3):
+    runner = CliRunner()
+    result = runner.invoke(gitorg.gitorg, ['configure'],
+                           obj={}, env={'GITHUB_TOKEN': '1234'})
+    assert result.exit_code == 0
+
+@mock.patch('gitorg.click.echo')
+@mock.patch("gitorg.click.prompt")
+@mock.patch("gitorg.config.Config")
+def test_first_time_configure_doesnt_throw(_, _2, config):
+    runner = CliRunner()
+    config.load.side_effect = IOError
+    result = runner.invoke(gitorg.gitorg, ['configure'],
+                           obj={}, env={'GITHUB_TOKEN': '1234'})
+    assert result.exit_code == 0

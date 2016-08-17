@@ -28,7 +28,7 @@ class TestConfig(unittest.TestCase):
     def test_save_config(self, open_mock):
         cfg = config.Config({"global": {"option": True}, "status": {"option": False}})
         cfg.save("filename")
-        print open_mock.assert_called_with("filename", "w")
+        open_mock.assert_called_with("filename", "w")
 
     @mock.patch("gitorg.config.open",
                 mock.mock_open(read_data="""{"c":{"a":1}}"""),
