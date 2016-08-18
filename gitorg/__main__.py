@@ -1,4 +1,4 @@
-from gitorg import gitorg, load_config, initial_config
+from gitorg import gitorg, load_config
 
 
 def main():
