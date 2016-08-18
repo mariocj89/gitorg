@@ -335,7 +335,7 @@ def test_pull_missing_repo(gh, wd_mock, _, listdir_mock, clone_mock):
 @mock.patch('gitorg.os.path.isdir')
 @mock.patch('gitorg.os.getcwd')
 @mock.patch("gitorg.github.Github")
-def test_status_of_a_user(gh, wd_mock, _, listdir_mock, clone_mock):
+def test_pull_a_user(gh, wd_mock, _, listdir_mock, clone_mock):
     runner = CliRunner()
     gh.return_value.get_organization.return_value.get_repos.return_value = []
     wd_mock.return_value = "orgname"
@@ -355,7 +355,7 @@ def test_status_of_a_user(gh, wd_mock, _, listdir_mock, clone_mock):
 @mock.patch('gitorg.os.path.isdir')
 @mock.patch('gitorg.os.getcwd')
 @mock.patch("gitorg.github.Github")
-def test_status_of_invalid_org(gh, wd_mock, _, listdir_mock, clone_mock):
+def test_pull_of_invalid_org(gh, wd_mock, _, listdir_mock, clone_mock):
     runner = CliRunner()
     gh.return_value.get_organization.return_value.get_repos.return_value = []
     wd_mock.return_value = "orgname"
