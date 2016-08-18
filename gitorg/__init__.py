@@ -26,6 +26,25 @@ def load_config():
     return conf
 
 
+def _clone_repo(repo, target_path, use_ssh):
+    """Clones a github repo locally
+
+    :param repo: github repo to clone as returned from the github api
+    :param target_path: path to clone the repo to (full path)
+    :param use_ssh: whether to use ssh protocol instead of http
+    """
+
+    if repo.fork:  # Fork will be cloned from source and add fork remote
+        source = repo.source
+        url = source.ssh_url if use_ssh else source.git_url
+        r = git.Repo.clone_from(url, target_path)
+        fork_url = repo.ssh_url if use_ssh else repo.git_url
+        r.create_remote('fork', fork_url)
+    else:
+        url = repo.ssh_url if use_ssh else repo.git_url
+        git.Repo.clone_from(url, target_path)
+
+
 def initial_config():
     """Asks the user for the general configuration for the app"""
     conf = load_config()
@@ -100,15 +119,38 @@ def clone(ctx, organization, target, use_ssh, clone_forks):
     repos = [repo for repo in org.get_repos() if not repo.fork or clone_forks]
     with click.progressbar(repos) as pbar:
         for repo in pbar:
-            if repo.fork:  # Fork will be cloned from source and add fork remote
-                source = repo.source
-                url = source.ssh_url if use_ssh else source.git_url
-                r = git.Repo.clone_from(url, os.path.join(target, repo.name))
-                fork_url = repo.ssh_url if use_ssh else repo.git_url
-                r.create_remote('fork', fork_url)
-            else:
-                url = repo.ssh_url if use_ssh else repo.git_url
-                git.Repo.clone_from(url, os.path.join(target, repo.name))
+            _clone_repo(repo, os.path.join(target, repo.name), use_ssh)
+
+
+@gitorg.command()
+@click.argument("organization", required=False)
+@click.option("--use_ssh/--use_http", is_flag=True, envvar="GITORG_USE_SSH",
+              help="Protocol to use to clone")
+@click.option("--clone_forks", is_flag=True, envvar="GITORG_FORKS",
+              help="Clone missing forks as well")
+@click.pass_context
+def pull(ctx, organization, use_ssh, clone_forks):
+    """Bring all repos in the github org that are missing locally"""
+    gh = ctx.obj['github']
+
+    working_dir = os.getcwd()
+    organization = organization or os.path.basename(working_dir)
+
+    try:
+        org = gh.get_organization(organization)
+    except github.GithubException:
+        try:
+            org = gh.get_user(organization)
+        except github.GithubException:
+            raise click.UsageError("{} does not exist in github"
+                                   .format(organization))
+    local_repos = {name for name in os.listdir(working_dir) if os.path.isdir(name)}
+    gh_repos = {repo for repo in org.get_repos() if not repo.fork or clone_forks}
+
+    missing_local = [repo for repo in gh_repos if repo.name not in local_repos]
+
+    for repo in sorted(missing_local):
+        _clone_repo(repo, os.path.join(working_dir, repo.name), use_ssh)
 
 
 @gitorg.command()

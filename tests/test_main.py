@@ -303,3 +303,69 @@ def test_first_time_configure_doesnt_throw(_, _2, config):
     result = runner.invoke(gitorg.gitorg, ['configure'],
                            obj={}, env={'GITHUB_TOKEN': '1234'})
     assert result.exit_code == 0
+
+
+@mock.patch("gitorg._clone_repo")
+@mock.patch('gitorg.os.listdir')
+@mock.patch('gitorg.os.path.isdir')
+@mock.patch('gitorg.os.getcwd')
+@mock.patch("gitorg.github.Github")
+def test_pull_missing_repo(gh, wd_mock, _, listdir_mock, clone_mock):
+    runner = CliRunner()
+    repo1 = mock.Mock(fork=False)
+    repo1.name = 'gitorg'
+    repo2 = mock.Mock(fork=False)
+    repo2.name = 'hubsync'
+    get_repos_mock = gh.return_value.get_organization.return_value.get_repos
+    get_repos_mock.return_value = [repo1, repo2]
+
+    wd_mock.return_value = "orgname"
+    listdir_mock.return_value = ["gitorg"]
+
+    result = runner.invoke(gitorg.gitorg, ['pull'],
+                           obj={}, env={'GITHUB_TOKEN': '1234'})
+
+    gh.return_value.get_organization.assert_called_with("orgname")
+    assert result.exit_code == 0
+    clone_mock.assert_called_once_with(repo2, "orgname/hubsync", False)
+
+
+@mock.patch("gitorg._clone_repo")
+@mock.patch('gitorg.os.listdir')
+@mock.patch('gitorg.os.path.isdir')
+@mock.patch('gitorg.os.getcwd')
+@mock.patch("gitorg.github.Github")
+def test_status_of_a_user(gh, wd_mock, _, listdir_mock, clone_mock):
+    runner = CliRunner()
+    gh.return_value.get_organization.return_value.get_repos.return_value = []
+    wd_mock.return_value = "orgname"
+    listdir_mock.return_value = []
+
+    gh.return_value.get_organization.side_effect = github.GithubException(1, 1)
+    result = runner.invoke(gitorg.gitorg, ['pull'],
+                           obj={}, env={'GITHUB_TOKEN': '1234'})
+
+    gh.return_value.get_user.assert_called_with("orgname")
+    assert result.exit_code == 0
+    assert not clone_mock.called
+
+
+@mock.patch("gitorg._clone_repo")
+@mock.patch('gitorg.os.listdir')
+@mock.patch('gitorg.os.path.isdir')
+@mock.patch('gitorg.os.getcwd')
+@mock.patch("gitorg.github.Github")
+def test_status_of_invalid_org(gh, wd_mock, _, listdir_mock, clone_mock):
+    runner = CliRunner()
+    gh.return_value.get_organization.return_value.get_repos.return_value = []
+    wd_mock.return_value = "orgname"
+    listdir_mock.return_value = []
+
+    gh.return_value.get_organization.side_effect = github.GithubException(1, 1)
+    gh.return_value.get_user.side_effect = github.GithubException(1, 1)
+    result = runner.invoke(gitorg.gitorg, ['pull'],
+                           obj={}, env={'GITHUB_TOKEN': '1234'})
+
+    assert result.exit_code == 2
+    assert not clone_mock.called
+
