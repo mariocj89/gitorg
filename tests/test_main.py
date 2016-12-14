@@ -287,8 +287,10 @@ def test_status_of_invalid_org(gh, wd_mock, _, listdir_mock, echo_mock):
 
 @mock.patch('gitorg.click.echo')
 @mock.patch("gitorg.click.prompt")
+@mock.patch("gitorg.getpass")
+@mock.patch("gitorg.github_token")
 @mock.patch("gitorg.config.Config")
-def test_configure_doesnt_throw(_, _2, _3):
+def test_configure_doesnt_throw(*_):
     runner = CliRunner()
     result = runner.invoke(gitorg.gitorg, ['configure'],
                            obj={}, env={'GITHUB_TOKEN': '1234'})
@@ -296,8 +298,10 @@ def test_configure_doesnt_throw(_, _2, _3):
 
 @mock.patch('gitorg.click.echo')
 @mock.patch("gitorg.click.prompt")
+@mock.patch("gitorg.getpass")
+@mock.patch("gitorg.github_token")
 @mock.patch("gitorg.config.Config")
-def test_first_time_configure_doesnt_throw(_, _2, config):
+def test_first_time_configure_doesnt_throw(_, _2, _3, _4, config):
     runner = CliRunner()
     config.load.side_effect = IOError
     result = runner.invoke(gitorg.gitorg, ['configure'],
