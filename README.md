@@ -13,7 +13,7 @@ Tool to organise and synchronise your organisations locally with github
 # Usage
 `gitorg` aims to be as similar as possible to your experience with `git`.
 
-Note you need to provide an user or a token to use gitorg
+The first time that you run gitorg it will configure the required options for you
 
 Examples:
 

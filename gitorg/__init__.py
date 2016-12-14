@@ -4,6 +4,8 @@ import click
 import github
 import git
 import os
+import getpass
+import github_token
 
 from gitorg import config
 
@@ -48,14 +50,12 @@ def _clone_repo(repo, target_path, use_ssh):
 def initial_config():
     """Asks the user for the general configuration for the app"""
     conf = load_config()
-    use_token = click.prompt("Do you know how to get your github api token? ",
-                             type=bool, default=True)
-    if use_token:
-        token = click.prompt("Insert a valid github user token: ")
-        conf["token"] = token
-    else:
-        user = click.prompt("What is your github user? ")
-        conf["user"] = user
+    user = click.prompt("What is your username? ")
+    password = getpass.getpass()
+    token_factory = github_token.TokenFactory(user, password, "gitorg",
+                                              ["read:org", "repo", "user:email"])
+    token = token_factory(tfa_token_callback=lambda: click.prompt("Insert your TFA token: "))
+    conf["token"] = token
 
     github_url = click.prompt("What is your github instance API url? ",
                               default=DEFAULT_GITHUB_BASE_URL)
