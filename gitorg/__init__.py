@@ -17,15 +17,11 @@ CONFIG_FILE = os.path.join(APP_DIR, 'config.json')
 def load_config():
     """Returns a config object loaded from disk or an empty dict"""
     try:
-        conf = config.Config.load(CONFIG_FILE)
+        return config.Config.load(CONFIG_FILE)
     except IOError:
-        conf = config.Config()
-        conf["metadata"] = dict(config_time=time.time())
         if not os.path.isdir(APP_DIR):
             os.mkdir(APP_DIR)
-        conf.save(CONFIG_FILE)
-        initial_config()
-    return conf
+        return initial_config()
 
 
 def _clone_repo(repo, target_path, use_ssh):
@@ -49,7 +45,9 @@ def _clone_repo(repo, target_path, use_ssh):
 
 def initial_config():
     """Asks the user for the general configuration for the app"""
-    conf = load_config()
+    click.echo("Configuring {}".format(CONFIG_FILE))
+    conf = config.Config()
+    conf["metadata"] = dict(config_time=time.time())
     user = click.prompt("What is your username? ")
     password = getpass.getpass()
     token_factory = github_token.TokenFactory(user, password, "gitorg",
@@ -62,13 +60,14 @@ def initial_config():
     conf["github_base_url"] = github_url
 
     commands = ["clone", "pull", "status"]
-    use_ssh = click.confirmation_option("Do you want have ssh keys set up? ")
-    forks = click.confirmation_option("Do you want to include forks? ")
+    use_ssh = click.confirm("Do you want have ssh keys set up? ")
+    forks = click.confirm("Do you want to include forks? ")
     for c in commands:
         conf[c] = dict(forks=forks, use_ssh=use_ssh)
 
     conf.save(CONFIG_FILE)
     click.echo("Config saved in: '{}'".format(CONFIG_FILE))
+    return conf
 
 
 @click.group()
