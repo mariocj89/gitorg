@@ -140,7 +140,7 @@ def test_clone_org_with_fork_flag(gh, _, isdir_mock, clone_mock):
     fork_repo.source.name = 'repofake'
     get_repos_mock = gh.return_value.get_organization.return_value.get_repos
     get_repos_mock.return_value = [fork_repo]
-    result = runner.invoke(gitorg.gitorg, ['clone', 'my_user', '--clone_forks'],
+    result = runner.invoke(gitorg.gitorg, ['clone', 'my_user', '--forks'],
                            obj={}, env={'GITHUB_TOKEN': '1234'})
 
     assert result.exit_code == 0
