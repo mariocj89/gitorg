@@ -24,7 +24,7 @@ setup(
     license='MIT',
     test_suite='nose.collector',
     use_2to3=True,
-    install_requires=['six', 'PyGithub', 'GitPython', 'github_token'],
+    install_requires=['six', 'PyGithub', 'GitPython', 'github_token', 'click', 'smmap'],
     entry_points={
         'console_scripts': [
             'gitorg=gitorg.__main__:main'
