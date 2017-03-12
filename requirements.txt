@@ -9,3 +9,4 @@ PyGithub==1.26.0
 six==1.10.0
 smmap==0.9.0
 github_token==0.1.0
+pytest==3.0.5
