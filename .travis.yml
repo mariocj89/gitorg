@@ -1,13 +1,12 @@
 language: python
 sudo: false
 python:
-      - "2.7"
-      - "3.5"
+      - "3.6"
 install:
-    - "pip install -r requirements.txt"
-    - "pip install python-coveralls"
+    - "sudo apt-get install libgit2-dev"
+    - "pip install -r dev-requirements.txt"
+    - "pip install coveralls pytest-cov"
 script:
-    - "nosetests -v tests"
-# report coverage to coveralls.io
+    - "python -m pytest tests --cov=gitorg"
 after_success:
     - coveralls

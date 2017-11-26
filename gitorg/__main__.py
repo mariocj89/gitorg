@@ -1,9 +1,6 @@
-from gitorg import gitorg, load_config
+import sys
+from . import cli
 
 
-def main():
-    conf = load_config()
-    gitorg(obj={}, default_map=conf)
-
-if __name__ == '__main__':  # pragma: no cover
-    exit(main())
+if __name__ == "__main__":
+    exit(cli.run(sys.argv[1:]))
