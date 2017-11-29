@@ -1,7 +1,6 @@
 """Core functionality. All commands are defined here"""
 import re
 import os
-import pygit2
 
 from . import git
 from . import file
@@ -40,11 +39,7 @@ def _get_repo_list(gitorg_file):
 def _discover_repos(path):
     for repo_folder in os.listdir(path):
         repo_path = os.path.join(path, repo_folder)
-        try:
-            pygit2.Repository(repo_path)
-        except pygit2.GitError:
-            continue
-        else:
+        if git.is_repo(repo_path):
             repo_name = os.path.basename(repo_path)
             yield protocols.Repo(name=repo_name, url=repo_path)
 
