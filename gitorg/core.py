@@ -6,6 +6,8 @@ from . import git
 from . import file
 from . import protocols
 
+# TODO: Rename this file to commands and move the utils elsewhere
+
 
 class UnknownProtocol(Exception):
     pass
