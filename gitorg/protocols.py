@@ -2,7 +2,7 @@
 import enum
 import fnmatch
 import re
-import os.path
+import os
 
 import github
 
@@ -57,7 +57,10 @@ class Github(Base):
     def __init__(self, *, api_url=_DEFAULT_BASE_URL, clone_protocol="ssh", **kwargs):
         super().__init__(**kwargs)
         self._clone_protocol = self.CloneProtocol(clone_protocol)
-        self._gh = github.Github(base_url=api_url)
+        self._gh = github.Github(
+            login_or_token=os.environ.get("GITHUB_TOKEN"),
+            base_url=api_url
+        )
 
     def list(self, pattern):
         res = self._EXTRACT_PATTERN.match(pattern)
