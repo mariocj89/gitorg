@@ -1,4 +1,5 @@
 set -e
+set -x
 
 # Create temp repo
 pushd $(mktemp -d)
