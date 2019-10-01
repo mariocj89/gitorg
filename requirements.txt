@@ -1,2 +1,2 @@
 PyGithub==1.35
-PyYAML==3.12
+PyYAML==5.1
